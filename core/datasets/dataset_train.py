@@ -38,15 +38,15 @@ class DatasetTrain(Dataset):
         self.scale = self.data['scale']
         self.center = self.data['center']
         if 'pose_cam' in self.data:
-            self.body_pose = self.data['pose_cam'][:, :NUM_PARAMS_SMPL*3].astype(np.float) #Change 24 
+            self.body_pose = self.data['pose_cam'][:, :NUM_PARAMS_SMPL*3].astype(np.float32) #Change 24 
         elif 'pose' in self.data:
-            self.body_pose = self.data['pose'][:, :NUM_PARAMS_SMPL*3].astype(np.float) #Change 24 
+            self.body_pose = self.data['pose'][:, :NUM_PARAMS_SMPL*3].astype(np.float32) #Change 24 
         else:
             self.body_pose = np.zeros((len(self.imgname), NUM_PARAMS_SMPL*3), dtype=np.float32)  
 
         if self.body_pose.shape[1] == NUM_PARAMS_SMPL:
             self.body_pose = self.body_pose.reshape(-1,NUM_PARAMS_SMPL*3)      
-        self.betas = self.data['shape'].astype(np.float)[:,:NUM_BETAS] 
+        self.betas = self.data['shape'].astype(np.float32)[:,:NUM_BETAS] 
         self.cam_int = self.data['cam_int']
         self.keypoints = self.data['gtkps'][:,:NUM_JOINTS]
         self.length = self.scale.shape[0]

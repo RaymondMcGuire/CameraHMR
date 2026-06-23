@@ -1,12 +1,13 @@
 
 import os
+
+os.environ['PYOPENGL_PLATFORM'] = 'egl'
+
 import trimesh
 import pyrender
 import numpy as np
 import colorsys
 import cv2
-
-os.environ['PYOPENGL_PLATFORM'] = 'egl'
 
 class Renderer(object):
 

@@ -45,14 +45,14 @@ class DatasetVal(Dataset):
 
         if 'pose_cam' in self.data:
             if 'smplx' in self.dataset:
-                self.pose = self.data['pose_cam'][:, :22*3].astype(np.float)
+                self.pose = self.data['pose_cam'][:, :22*3].astype(np.float32)
             else:
-                self.pose = self.data['pose_cam'][:, :NUM_PARAMS_SMPL*3].astype(np.float)
+                self.pose = self.data['pose_cam'][:, :NUM_PARAMS_SMPL*3].astype(np.float32)
         else:
             self.pose = np.zeros((len(self.imgname), 24*3), dtype=np.float32)
 
         if 'shape' in self.data:
-            self.betas = self.data['shape'].astype(np.float)[:,:NUM_BETAS] 
+            self.betas = self.data['shape'].astype(np.float32)[:,:NUM_BETAS] 
         else:
             self.betas = np.zeros((len(self.imgname), 10), dtype=np.float32)
 

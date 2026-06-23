@@ -9,7 +9,7 @@ class DenseKP(pl.LightningModule):
         self.backbone = create_backbone()
         self.head = build_keypoints_head()
 
-    def forward(self, batch)
+    def forward(self, batch):
         x = batch['img']
         batch_size = x.shape[0]
 

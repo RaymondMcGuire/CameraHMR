@@ -1,13 +1,29 @@
-CHECKPOINT_PATH='data/pretrained-models/camerahmr_checkpoint_cleaned.ckpt'
-CHECKPOINT_PATH_SMPLX='data/pretrained-models//bedlam_v1_v2.ckpt'
-CAM_MODEL_CKPT='data/pretrained-models/cam_model_cleaned.ckpt'
-DENSEKP_CKPT='data/pretrained-models/densekp.ckpt'
-SMPL_MEAN_PARAMS_FILE='data/smpl_mean_params.npz'
-SMPL_MODEL_PATH='data/models/SMPL/SMPL_NEUTRAL.pkl'
-SMPLX_MODEL_PATH='data/models/SMPLX/SMPLX_NEUTRAL.npz'
+import os
+from pathlib import Path
 
-DETECTRON_CKPT='data/pretrained-models/model_final_f05665.pkl'
-DETECTRON_CFG='core/utils/cascade_mask_rcnn_vitdet_h_75ep.py'
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+DATA_ROOT = Path(os.environ.get("CAMERAHMR_DATA_DIR", PROJECT_ROOT / "data")).resolve()
+
+
+def data_path(*parts):
+    return str(DATA_ROOT.joinpath(*parts))
+
+
+def project_path(*parts):
+    return str(PROJECT_ROOT.joinpath(*parts))
+
+
+CHECKPOINT_PATH = data_path('pretrained-models', 'camerahmr_checkpoint_cleaned.ckpt')
+CHECKPOINT_PATH_SMPLX = data_path('pretrained-models', 'bedlam_v1_v2.ckpt')
+CAM_MODEL_CKPT = data_path('pretrained-models', 'cam_model_cleaned.ckpt')
+DENSEKP_CKPT = data_path('pretrained-models', 'densekp.ckpt')
+SMPL_MEAN_PARAMS_FILE = data_path('smpl_mean_params.npz')
+SMPL_MODEL_PATH = data_path('models', 'SMPL', 'SMPL_NEUTRAL.pkl')
+SMPLX_MODEL_PATH = data_path('models', 'SMPLX', 'SMPLX_NEUTRAL.npz')
+
+DETECTRON_CKPT = data_path('pretrained-models', 'model_final_f05665.pkl')
+DETECTRON_CFG = project_path('core', 'utils', 'cascade_mask_rcnn_vitdet_h_75ep.py')
 TRANSFORMER_DECODER={'depth': 6,
                     'heads': 8,
                     'mlp_dim': 1024,
@@ -36,14 +52,14 @@ extra_permutation = [5, 4, 3, 2, 1, 0, 11, 10, 9, 8, 7, 6, 12, 13, 14, 15, 16, 1
 smpl_to_openpose = [24, 12, 17, 19, 21, 16, 18, 20, 0, 2, 5, 8, 1, 4,
                     7, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34]
 FLIP_KEYPOINT_PERMUTATION = body_permutation + [25 + i for i in extra_permutation]
-SMPL_to_J19 = 'data/train-eval-utils/SMPL_to_J19.pkl'
-JOINT_REGRESSOR_TRAIN_EXTRA = 'data/train-eval-utils/J_regressor_extra.npy'
-SMPLX2SMPL='data/train-eval-utils/smplx2smpl.pkl'
-DOWNSAMPLE_MAT='data/train-eval-utils/downsample_mat.pkl'
-REGRESSOR_H36M='data/train-eval-utils/J_regressor_h36m.npy'
-SMPLX_MODEL_DIR='data/models/smplx_neutral_head/models_lockedhead/smplx'
-SMPL_MODEL_DIR='data/models/SMPL'
-VITPOSE_BACKBONE='data/train-eval-utils/vitpose_backbone.pth'
+SMPL_to_J19 = data_path('train-eval-utils', 'SMPL_to_J19.pkl')
+JOINT_REGRESSOR_TRAIN_EXTRA = data_path('train-eval-utils', 'J_regressor_extra.npy')
+SMPLX2SMPL = data_path('train-eval-utils', 'smplx2smpl.pkl')
+DOWNSAMPLE_MAT = data_path('train-eval-utils', 'downsample_mat.pkl')
+REGRESSOR_H36M = data_path('train-eval-utils', 'J_regressor_h36m.npy')
+SMPLX_MODEL_DIR = data_path('models', 'smplx_neutral_head', 'models_lockedhead', 'smplx')
+SMPL_MODEL_DIR = data_path('models', 'SMPL')
+VITPOSE_BACKBONE = data_path('train-eval-utils', 'vitpose_backbone.pth')
 JOINT_NAMES = [
 # 25 OpenPose joints (in the order provided by OpenPose)
 'OP Nose',

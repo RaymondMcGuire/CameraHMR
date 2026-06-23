@@ -1,4 +1,7 @@
 import os
+
+os.environ['PYOPENGL_PLATFORM'] = 'egl'
+
 import cv2
 import torch
 import trimesh
@@ -7,9 +10,6 @@ import numpy as np
 from smplx import SMPL
 from torchvision.utils import make_grid
 from typing import List, Set, Dict, Tuple, Optional
-
-
-os.environ['PYOPENGL_PLATFORM'] = 'egl'
 
 def get_colors():
     colors = {

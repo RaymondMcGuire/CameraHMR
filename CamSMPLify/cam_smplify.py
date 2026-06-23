@@ -53,8 +53,8 @@ class SMPLify:
     """Implementation of single-stage SMPLify."""
 
     def __init__(self, step_size=1e-3, batch_size=1, num_iters=5000, focal_length=5000,
-                 device=torch.device('cuda'), vis=False, verbose=False, save_path=None):
-        self.device = device or torch.device("cpu")
+                 device=None, vis=False, verbose=False, save_path=None):
+        self.device = device or torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.focal_length = focal_length
         self.step_size = step_size
         self.num_iters = num_iters
@@ -64,7 +64,7 @@ class SMPLify:
         self.smpl = SMPL(SMPL_MODEL_DIR).to(self.device)
         self.vis = vis
         self.save_path = save_path
-        self.downsample_mat = pickle.load(open(DOWNSAMPLE_MAT, 'rb')).to_dense().cuda()
+        self.downsample_mat = pickle.load(open(DOWNSAMPLE_MAT, 'rb')).to_dense().to(self.device)
 
             
     def visualize_result(self, image_full, smpl_output, focal_length, bbox_center, bbox_scale, camera_translation, cam_int):

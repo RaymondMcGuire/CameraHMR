@@ -1,12 +1,34 @@
 import os
+from pathlib import Path
 from typing import Dict
 from yacs.config import CfgNode as CN
-curr_dir = os.path.abspath(os.path.dirname(__file__))
-base_dir = os.path.join(curr_dir, '../../')
+
+curr_dir = Path(__file__).resolve().parent
+PROJECT_ROOT = curr_dir.parents[1]
+DATA_ROOT = Path(os.environ.get("CAMERAHMR_DATA_DIR", PROJECT_ROOT / "data")).resolve()
+base_dir = str(PROJECT_ROOT)
+
+
+def _resolve_project_path(path: str) -> str:
+    path_obj = Path(path)
+    project_data = PROJECT_ROOT / "data"
+
+    if path_obj.is_absolute():
+        try:
+            return str(DATA_ROOT / path_obj.relative_to(project_data))
+        except ValueError:
+            return str(path_obj)
+
+    parts = path_obj.parts
+    if parts and parts[0] == "data":
+        return str(DATA_ROOT.joinpath(*parts[1:]))
+
+    return str(PROJECT_ROOT / path_obj)
+
+
 DATASET_FOLDERS = {
 
     '3dpw-test-cam-smpl': os.path.join(base_dir, 'data/test-images/3DPW'),
-    'coco-val-smpl': os.path.join(base_dir, 'data/test-images/COCO2017/images/'),
     'emdb-smpl': os.path.join(base_dir, 'data/test-images/EMDB'),
     'spec-test-smpl': os.path.join(base_dir, 'data/test-images/spec-syn'),
     'rich-smplx': os.path.join(base_dir, 'data/test-images/RICH'),
@@ -316,6 +338,12 @@ DATASET_FILES = [
         "middleeast-vacam-b2v40-smplx-notest": "data/training-labels/bedlam_v2/20250219_3-4_250_middleeast_vcam_approach.npz",
 
     }
+]
+
+DATASET_FOLDERS = {key: _resolve_project_path(path) for key, path in DATASET_FOLDERS.items()}
+DATASET_FILES = [
+    {key: _resolve_project_path(path) for key, path in split.items()}
+    for split in DATASET_FILES
 ]
 
 def to_lower(x: Dict) -> Dict:

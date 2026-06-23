@@ -31,14 +31,36 @@
 
 
 ## **Installation**
-Create a conda environment and install all the requirements.
+The project is now described by `pyproject.toml` and can be recreated with
+[uv](https://docs.astral.sh/uv/). The default research environment follows the
+original release: Python 3.10, PyTorch 2.0.0, torchvision 0.15.1, torchaudio
+2.0.1, and CUDA 11.8.
 
 ```
-conda create -n camerahmr python=3.10
-conda activate camerahmr
-pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118
-pip install -r requirements.txt
+uv sync --extra cu118 --extra demo
 ```
+
+The image demos also need Detectron2. Install it after `uv sync` so it can
+build against the already-installed PyTorch:
+
+```bash
+uv pip install --python .venv/bin/python --no-build-isolation "detectron2 @ git+https://github.com/facebookresearch/detectron2.git"
+```
+
+After this manual Detectron2 step, run commands with `uv run --no-sync ...`.
+Windows users should use the interpreter path shown in
+[docs/environment.md](docs/environment.md).
+
+For Docker:
+
+```bash
+docker build -t camerahmr:demo-cu118 .
+```
+
+See [docs/environment.md](docs/environment.md) for CPU setup, data mounts, and
+container run examples. Windows + WSL users can follow
+[docs/windows-wsl-docker.md](docs/windows-wsl-docker.md). `requirements.txt` is
+kept as a legacy reference, but uv is the preferred path.
 
 ## 🎬 **Demo**
 

@@ -12,14 +12,16 @@
 This ReadMe provides instructions for using the BEDLAM2 (SMPL-X) dataset in training and evaluating CameraHMR. For the SMPL version, please refer to the main [ReadMe.md](../ReadMe.md).
 
 ## **Installation**
-Create a conda environment and install all the requirements.
+Use the uv environment defined at the repository root. This keeps the BEDLAM2
+setup aligned with the main CameraHMR setup.
 
 ```
-conda create -n camerahmr python=3.10
-conda activate camerahmr
-pip install torch==2.0.0 torchvision==0.15.1 torchaudio==2.0.1 --index-url https://download.pytorch.org/whl/cu118
-pip install -r requirements.txt
+uv sync --extra cu118 --extra demo
 ```
+
+For training, add `--extra train --extra data --extra optimize` as needed.
+Docker users can build the CUDA 11.8 image with `docker build -t camerahmr:demo-cu118 .`.
+More details are in [docs/environment.md](environment.md).
 
 ## **Demo (SMPLX)**
 ###  **Download Demo required data**
