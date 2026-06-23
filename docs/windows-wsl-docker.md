@@ -96,6 +96,9 @@ If you downloaded data into this repository's `data` folder, the default
 
 ## 4. Build the Docker image in WSL
 
+The default Compose image targets CUDA 12.8 / PyTorch cu128 for RTX 5090 and
+other RTX 50-series GPUs.
+
 Use Compose:
 
 ```bash
@@ -106,8 +109,10 @@ If Detectron2 fails because your GPU architecture is not in the default list,
 set a narrower architecture list in `.env`, for example:
 
 ```env
-TORCH_CUDA_ARCH_LIST=8.6
+TORCH_CUDA_ARCH_LIST=12.0
 ```
+
+For many RTX 30-series cards, use `TORCH_CUDA_ARCH_LIST=8.6` instead.
 
 Then rebuild:
 
@@ -117,7 +122,9 @@ docker compose build
 
 ## 5. Run the SMPL demo
 
-Create an output directory on the Windows side through WSL:
+Create an output directory on the host side through WSL. Compose usually creates
+missing bind-mount directories, but creating it explicitly makes the path and
+permissions obvious:
 
 ```bash
 mkdir -p /mnt/d/SMPL-project/CameraHMR/output_images
@@ -176,11 +183,11 @@ docker compose run --rm camerahmr
 Before building or running the demo, this optional check should work inside WSL:
 
 ```bash
-docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
+docker run --rm --gpus all nvidia/cuda:12.8.0-base-ubuntu22.04 nvidia-smi
 ```
 
 This does not build the CameraHMR image. Docker pulls NVIDIA's official CUDA
-11.8 test image and runs `nvidia-smi` inside it. It only checks that Docker
+12.8 test image and runs `nvidia-smi` inside it. It only checks that Docker
 Desktop, WSL, and the NVIDIA driver can pass the GPU into containers.
 
 If it does not, enable Docker Desktop WSL integration and install/update the

@@ -32,12 +32,13 @@
 
 ## **Installation**
 The project is now described by `pyproject.toml` and can be recreated with
-[uv](https://docs.astral.sh/uv/). The default research environment follows the
-original release: Python 3.10, PyTorch 2.0.0, torchvision 0.15.1, torchaudio
-2.0.1, and CUDA 11.8.
+[uv](https://docs.astral.sh/uv/). The Docker/Compose environment defaults to
+Python 3.10, PyTorch 2.7.1, torchvision 0.22.1, torchaudio 2.7.1, and CUDA
+12.8 so RTX 50-series GPUs can run the demo. The original CUDA 11.8 research
+stack is still available as the `cu118` extra for older GPUs.
 
 ```
-uv sync --extra cu118 --extra demo
+uv sync --extra cu128 --extra demo
 ```
 
 The image demos also need Detectron2. Install it after `uv sync` so it can

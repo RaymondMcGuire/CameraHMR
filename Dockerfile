@@ -1,13 +1,13 @@
 # syntax=docker/dockerfile:1.7
 
-ARG CUDA_IMAGE=nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
+ARG CUDA_IMAGE=nvidia/cuda:12.8.0-devel-ubuntu22.04
 ARG UV_IMAGE=ghcr.io/astral-sh/uv:0.11.23
 
 FROM ${UV_IMAGE} AS uv
 FROM ${CUDA_IMAGE}
 
 ARG DEBIAN_FRONTEND=noninteractive
-ARG TORCH_CUDA_ARCH_LIST="7.5;8.0;8.6;8.9;9.0"
+ARG TORCH_CUDA_ARCH_LIST="12.0"
 
 ENV FORCE_CUDA=1 \
     PYOPENGL_PLATFORM=egl \
@@ -50,11 +50,11 @@ WORKDIR /workspace/CameraHMR
 
 COPY pyproject.toml ReadMe.md ./
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --python /usr/bin/python3.10 --extra cu118 --extra demo --no-install-project
+    uv sync --python /usr/bin/python3.10 --extra cu128 --extra demo --no-install-project
 
 COPY . .
 RUN --mount=type=cache,target=/root/.cache/uv \
-    uv sync --python /usr/bin/python3.10 --extra cu118 --extra demo
+    uv sync --python /usr/bin/python3.10 --extra cu128 --extra demo
 
 RUN --mount=type=cache,target=/root/.cache/uv \
     uv pip install --python /opt/camerahmr/.venv/bin/python --no-build-isolation \

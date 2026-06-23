@@ -1,16 +1,20 @@
 # CameraHMR uv and Docker environment
 
 This repository now uses `pyproject.toml` as the primary environment definition.
-The original code targets Python 3.10, PyTorch 2.0.0, torchvision 0.15.1,
-torchaudio 2.0.1, and CUDA 11.8.
+The Docker/Compose path defaults to Python 3.10, PyTorch 2.7.1, torchvision
+0.22.1, torchaudio 2.7.1, and CUDA 12.8 so RTX 50-series GPUs can run the
+demo. The original release stack, PyTorch 2.0.0 with CUDA 11.8, is still
+available as the `cu118` extra for older GPUs.
 
 ## Local uv setup
 
-Install the CUDA 11.8 demo environment used by the Docker image:
+Install the CUDA 12.8 demo environment used by the Docker image:
 
 ```bash
-uv sync --extra cu118 --extra demo
+uv sync --extra cu128 --extra demo
 ```
+
+For the original CUDA 11.8 stack, use `uv sync --extra cu118 --extra demo`.
 
 The image demos use Detectron2 for person detection. Install it after `uv sync`
 so the source build sees the PyTorch version in the project environment:
@@ -58,7 +62,7 @@ The same directory structure is expected under that data root, for example
 
 ## Docker
 
-Build the CUDA 11.8 image:
+Build the CUDA 12.8 image:
 
 ```bash
 docker compose build
@@ -75,7 +79,7 @@ docker compose run --rm camerahmr
 ```
 
 If your GPU needs a different Detectron2 CUDA architecture list, override it at
-build time:
+build time. The default is `12.0` for RTX 5090 / `sm_120`.
 
 ```bash
 TORCH_CUDA_ARCH_LIST=8.6 docker compose build

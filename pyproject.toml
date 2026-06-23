@@ -16,7 +16,7 @@ dependencies = [
   "opencv-python==4.10.0.84",
   "pandas==2.1.1",
   "pyrootutils==1.0.4",
-  "pytorch-lightning==2.0.2",
+  "pytorch-lightning==2.0.7",
   "pyyaml==6.0.2",
   "rich==14.0.0",
   "scikit-image==0.21.0",
@@ -37,6 +37,11 @@ cu118 = [
   "torch==2.0.0",
   "torchaudio==2.0.1",
   "torchvision==0.15.1",
+]
+cu128 = [
+  "torch==2.7.1",
+  "torchaudio==2.7.1",
+  "torchvision==0.22.1",
 ]
 demo = [
   "matplotlib==3.8.4",
@@ -66,6 +71,7 @@ conflicts = [
   [
     { extra = "cpu" },
     { extra = "cu118" },
+    { extra = "cu128" },
   ],
 ]
 
@@ -76,14 +82,17 @@ chumpy = ["pip"]
 torch = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cu118", extra = "cu118" },
+  { index = "pytorch-cu128", extra = "cu128" },
 ]
 torchvision = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cu118", extra = "cu118" },
+  { index = "pytorch-cu128", extra = "cu128" },
 ]
 torchaudio = [
   { index = "pytorch-cpu", extra = "cpu" },
   { index = "pytorch-cu118", extra = "cu118" },
+  { index = "pytorch-cu128", extra = "cu128" },
 ]
 
 [[tool.uv.index]]
@@ -94,4 +103,9 @@ explicit = true
 [[tool.uv.index]]
 name = "pytorch-cu118"
 url = "https://download.pytorch.org/whl/cu118"
+explicit = true
+
+[[tool.uv.index]]
+name = "pytorch-cu128"
+url = "https://download.pytorch.org/whl/cu128"
 explicit = true

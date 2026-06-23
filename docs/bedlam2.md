@@ -16,11 +16,11 @@ Use the uv environment defined at the repository root. This keeps the BEDLAM2
 setup aligned with the main CameraHMR setup.
 
 ```
-uv sync --extra cu118 --extra demo
+uv sync --extra cu128 --extra demo
 ```
 
 For training, add `--extra train --extra data --extra optimize` as needed.
-Docker users can build the CUDA 11.8 image with `docker compose build`.
+Docker users can build the default CUDA 12.8 image with `docker compose build`.
 More details are in [docs/environment.md](environment.md).
 
 ## **Demo (SMPLX)**
