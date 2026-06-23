@@ -120,6 +120,13 @@ Then rebuild:
 docker compose build
 ```
 
+After the image has been built once, normal Python/source-code edits do not need
+another build. Compose live-mounts the repository into the container, while the
+uv environment stays inside the image at `/opt/camerahmr/.venv`. Rebuild only
+after changing dependency or image files such as `Dockerfile`, `compose.yaml`
+build args, `pyproject.toml`, CUDA/PyTorch versions, apt packages, or
+Detectron2 build settings.
+
 ## 5. Run the SMPL demo
 
 Create an output directory on the host side through WSL. Compose usually creates

@@ -78,6 +78,12 @@ Run the demo with GPU access and mounted data:
 docker compose run --rm camerahmr
 ```
 
+Compose mounts the repository into `/workspace/CameraHMR` at run time. After the
+image has been built once, Python/source changes are picked up by the next
+`docker compose run` without rebuilding. Rebuild only after changing
+`Dockerfile`, `compose.yaml` build args, `pyproject.toml`, uv dependency
+extras, CUDA/PyTorch versions, apt packages, or Detectron2 build settings.
+
 If your GPU needs a different Detectron2 CUDA architecture list, override it at
 build time. The default is `12.0` for RTX 5090 / `sm_120`.
 
