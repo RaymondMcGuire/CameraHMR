@@ -1,6 +1,8 @@
 # Windows download, WSL Docker run
 
 This path is for demo/inference only. It does not download training datasets.
+Demo/inference is enough to run CameraHMR on your own images. You only need the
+pretrained checkpoints, the detector checkpoint, and SMPL/SMPL-X model files.
 
 ## 1. Download demo data on Windows
 
@@ -12,8 +14,11 @@ scripts\fetch_demo_data_windows.bat D:\camerahmr-data
 
 If you double-click `scripts\fetch_demo_data_windows.bat` without arguments, it
 downloads to the repository-level `data` directory, not `scripts\data`.
-The window pauses before closing so you can read any curl or authentication
-errors.
+The window pauses before closing so you can read any download or authentication
+errors. The `.bat` file only changes to the repository root, calls
+`scripts\fetch_demo_data_windows.ps1`, and pauses; the PowerShell script handles
+the actual POST downloads, skip checks, file-size validation, and SMPL-X zip
+extraction.
 
 To save a log file, run it from `cmd.exe`:
 
@@ -31,6 +36,10 @@ D:\camerahmr-data
 ├── pretrained-models\model_final_f05665.pkl
 └── smpl_mean_params.npz
 ```
+
+The script prints each downloaded file size. If a checkpoint/model file is only
+a few KB, it is almost certainly an authentication, license, or server error
+page rather than the real file.
 
 For the SMPL-X / BEDLAM2 demo, add `smplx`:
 
