@@ -5,7 +5,7 @@ import torch
 import smplx
 import trimesh
 import numpy as np
-from glob import glob
+from pathlib import Path
 from torchvision.transforms import Normalize
 from detectron2.config import LazyConfig
 from core.utils.utils_detectron2 import DefaultPredictor_Lazy
@@ -17,6 +17,8 @@ from core.utils.checkpoint_io import torch_load_trusted, trusted_torch_load
 from core.utils.geometry import batch_rot2aa
 from core.cam_model.fl_net import FLNet
 from core.constants import IMAGE_SIZE, IMAGE_MEAN, IMAGE_STD, NUM_BETAS
+
+IMAGE_EXTENSIONS = {'.jpg', '.jpeg', '.png', '.gif', '.bmp', '.tiff', '.webp'}
 
 def resize_image(img, target_size):
     height, width = img.shape[:2]
@@ -146,11 +148,13 @@ class HumanMeshEstimator:
 
     def process_image(self, img_path, output_img_folder, i):
         img_cv2 = cv2.imread(str(img_path))
+        if img_cv2 is None:
+            print(f"[warn] Skipping unreadable image: {img_path}")
+            return
         img_cv2 = cv2.cvtColor(img_cv2, cv2.COLOR_BGR2RGB)
         
         fname, img_ext = os.path.splitext(os.path.basename(img_path))
         overlay_fname = os.path.join(output_img_folder, f'{os.path.basename(fname)}_{i:06d}{img_ext}')
-        smpl_fname = os.path.join(output_img_folder, f'{os.path.basename(fname)}_{i:06d}.smpl')
         mesh_fname = os.path.join(output_img_folder, f'{os.path.basename(fname)}_{i:06d}.obj')
         print(img_path)
         # Detect humans in the image
@@ -158,6 +162,9 @@ class HumanMeshEstimator:
         det_instances = det_out['instances']
         valid_idx = (det_instances.pred_classes == 0) & (det_instances.scores > 0.5)
         boxes = det_instances.pred_boxes.tensor[valid_idx].cpu().numpy()
+        if len(boxes) == 0:
+            print(f"[warn] No person detections above threshold for {img_path}")
+            return
         bbox_scale = (boxes[:, 2:4] - boxes[:, 0:2]) / 200.0 
         bbox_center = (boxes[:, 2:4] + boxes[:, 0:2]) / 2.0
 
@@ -192,7 +199,17 @@ class HumanMeshEstimator:
     def run_on_images(self, image_folder, out_folder):
         if not os.path.exists(out_folder):
             os.makedirs(out_folder)
-        image_extensions = ['*.jpg', '*.jpeg', '*.png', '*.gif', '*.bmp', '*.tiff', '*.webp']
-        images_list = [image for ext in image_extensions for image in glob(os.path.join(image_folder, ext))]
+        image_root = Path(image_folder)
+        if not image_root.exists():
+            raise FileNotFoundError(f"Input image folder does not exist: {image_root}")
+        images_list = sorted(
+            path for path in image_root.rglob("*")
+            if path.is_file() and path.suffix.lower() in IMAGE_EXTENSIONS
+        )
+        if not images_list:
+            supported = ", ".join(sorted(IMAGE_EXTENSIONS))
+            raise FileNotFoundError(
+                f"No input images found in {image_root}. Supported extensions: {supported}"
+            )
         for ind, img_path in enumerate(images_list):
             self.process_image(img_path, out_folder, ind)
