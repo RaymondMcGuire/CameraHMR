@@ -1,0 +1,25 @@
+services:
+  camerahmr:
+    image: camerahmr:demo-cu118
+    build:
+      context: .
+      args:
+        TORCH_CUDA_ARCH_LIST: ${TORCH_CUDA_ARCH_LIST:-7.5;8.0;8.6;8.9;9.0}
+    working_dir: /workspace/CameraHMR
+    gpus: all
+    volumes:
+      - ${CAMERAHMR_DATA_DIR:-./data}:/workspace/CameraHMR/data:ro
+      - ${CAMERAHMR_INPUT_DIR:-./demo_images}:/input_images:ro
+      - ${CAMERAHMR_OUTPUT_DIR:-./output_images}:/workspace/CameraHMR/output_images
+    command:
+      - uv
+      - run
+      - --no-sync
+      - python
+      - demo.py
+      - --image_folder
+      - /input_images
+      - --output_folder
+      - output_images
+      - --model_type
+      - ${CAMERAHMR_MODEL_TYPE:-smpl}

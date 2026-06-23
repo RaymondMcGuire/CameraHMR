@@ -33,7 +33,6 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev \
     libosmesa6 \
     libsm6 \
-    libturbojpeg0 \
     libxext6 \
     libxrender1 \
     ninja-build \

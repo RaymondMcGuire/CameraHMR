@@ -20,7 +20,7 @@ uv sync --extra cu118 --extra demo
 ```
 
 For training, add `--extra train --extra data --extra optimize` as needed.
-Docker users can build the CUDA 11.8 image with `docker build -t camerahmr:demo-cu118 .`.
+Docker users can build the CUDA 11.8 image with `docker compose build`.
 More details are in [docs/environment.md](environment.md).
 
 ## **Demo (SMPLX)**

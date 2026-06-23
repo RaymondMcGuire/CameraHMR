@@ -54,7 +54,7 @@ Windows users should use the interpreter path shown in
 For Docker:
 
 ```bash
-docker build -t camerahmr:demo-cu118 .
+docker compose build
 ```
 
 See [docs/environment.md](docs/environment.md) for CPU setup, data mounts, and

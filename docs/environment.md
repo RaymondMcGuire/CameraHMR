@@ -61,7 +61,7 @@ The same directory structure is expected under that data root, for example
 Build the CUDA 11.8 image:
 
 ```bash
-docker build -t camerahmr:demo-cu118 .
+docker compose build
 ```
 
 The Dockerfile runs `uv sync` first and then installs Detectron2 with
@@ -71,20 +71,16 @@ depend on Detectron2's Git repository.
 Run the demo with GPU access and mounted data:
 
 ```bash
-docker run --rm -it --gpus all \
-  -v "${PWD}/data:/workspace/CameraHMR/data" \
-  -v "${PWD}/output_images:/workspace/CameraHMR/output_images" \
-  camerahmr:demo-cu118 \
-  uv run --no-sync python demo.py --image_folder demo_images --output_folder output_images
+docker compose run --rm camerahmr
 ```
 
 If your GPU needs a different Detectron2 CUDA architecture list, override it at
 build time:
 
 ```bash
-docker build --build-arg TORCH_CUDA_ARCH_LIST="8.6" -t camerahmr:demo-cu118 .
+TORCH_CUDA_ARCH_LIST=8.6 docker compose build
 ```
 
-The Docker build installs the environment only. Running the demo, training, or
+The Compose build installs the environment only. Running the demo, training, or
 evaluation still requires the registered/downloaded CameraHMR, SMPL/SMPL-X, and
 dataset files described in the main README.

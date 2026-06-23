@@ -55,22 +55,50 @@ Open WSL and move to the repository:
 cd /mnt/d/SMPL-project/CameraHMR
 ```
 
-## 3. Build the Docker image in WSL
+## 3. Configure Docker Compose in WSL
 
-The data is not copied into the image. The build only creates the environment.
+The data is not copied into the image. It is mounted at run time.
+
+Create a local `.env` from the example:
 
 ```bash
-docker build -t camerahmr:demo-cu118 .
+cp .env.example .env
+```
+
+If you downloaded data to `D:\camerahmr-data`, edit `.env` to:
+
+```env
+CAMERAHMR_DATA_DIR=/mnt/d/camerahmr-data
+CAMERAHMR_INPUT_DIR=./demo_images
+CAMERAHMR_OUTPUT_DIR=./output_images
+CAMERAHMR_MODEL_TYPE=smpl
+```
+
+If you downloaded data into this repository's `data` folder, the default
+`CAMERAHMR_DATA_DIR=./data` is enough.
+
+## 4. Build the Docker image in WSL
+
+Use Compose:
+
+```bash
+docker compose build
 ```
 
 If Detectron2 fails because your GPU architecture is not in the default list,
-build with a narrower architecture list, for example:
+set a narrower architecture list in `.env`, for example:
 
-```bash
-docker build --build-arg TORCH_CUDA_ARCH_LIST="8.6" -t camerahmr:demo-cu118 .
+```env
+TORCH_CUDA_ARCH_LIST=8.6
 ```
 
-## 4. Run the SMPL demo
+Then rebuild:
+
+```bash
+docker compose build
+```
+
+## 5. Run the SMPL demo
 
 Create an output directory on the Windows side through WSL:
 
@@ -78,52 +106,59 @@ Create an output directory on the Windows side through WSL:
 mkdir -p /mnt/d/SMPL-project/CameraHMR/output_images
 ```
 
-Run the container and mount your Windows data directory into the path expected
-by the code:
+Run the container:
 
 ```bash
-docker run --rm -it --gpus all \
-  -v /mnt/d/camerahmr-data:/workspace/CameraHMR/data:ro \
-  -v /mnt/d/SMPL-project/CameraHMR/output_images:/workspace/CameraHMR/output_images \
-  camerahmr:demo-cu118
+docker compose run --rm camerahmr
 ```
 
-The default container command is equivalent to:
+The Compose command is equivalent to:
 
 ```bash
-uv run --no-sync python demo.py --image_folder demo_images --output_folder output_images
+uv run --no-sync python demo.py --image_folder /input_images --output_folder output_images
 ```
 
-## 5. Run with your own images
+## 6. Run with your own images
 
-If your images are in `D:\my-images`, mount that folder too:
+If your images are in `D:\my-images`, edit `.env`:
 
-```bash
-docker run --rm -it --gpus all \
-  -v /mnt/d/camerahmr-data:/workspace/CameraHMR/data:ro \
-  -v /mnt/d/my-images:/input_images:ro \
-  -v /mnt/d/SMPL-project/CameraHMR/output_images:/workspace/CameraHMR/output_images \
-  camerahmr:demo-cu118 \
-  uv run --no-sync python demo.py --image_folder /input_images --output_folder output_images
+```env
+CAMERAHMR_INPUT_DIR=/mnt/d/my-images
+CAMERAHMR_OUTPUT_DIR=./output_images
+CAMERAHMR_MODEL_TYPE=smpl
 ```
 
-For SMPL-X, use:
+Then run:
 
 ```bash
-docker run --rm -it --gpus all \
-  -v /mnt/d/camerahmr-data:/workspace/CameraHMR/data:ro \
-  -v /mnt/d/SMPL-project/CameraHMR/output_images_smplx:/workspace/CameraHMR/output_images_smplx \
-  camerahmr:demo-cu118 \
-  uv run --no-sync python demo.py --image_folder demo_images --output_folder output_images_smplx --model_type smplx
+docker compose run --rm camerahmr
+```
+
+For SMPL-X, edit `.env`:
+
+```env
+CAMERAHMR_OUTPUT_DIR=./output_images_smplx
+CAMERAHMR_MODEL_TYPE=smplx
+```
+
+Then run:
+
+```bash
+mkdir -p output_images_smplx
+docker compose run --rm camerahmr
 ```
 
 ## GPU check
 
-Before building or running the demo, this should work inside WSL:
+Before building or running the demo, this optional check should work inside WSL:
 
 ```bash
 docker run --rm --gpus all nvidia/cuda:11.8.0-base-ubuntu22.04 nvidia-smi
 ```
+
+This does not build the CameraHMR image. Docker pulls NVIDIA's official CUDA
+11.8 test image and runs `nvidia-smi` inside it. It only checks that Docker
+Desktop, WSL, and the NVIDIA driver can pass the GPU into containers.
 
 If it does not, enable Docker Desktop WSL integration and install/update the
 NVIDIA Windows driver with WSL GPU support.
