@@ -13,7 +13,9 @@ scripts\fetch_demo_data_windows.bat D:\camerahmr-data
 ```
 
 If you double-click `scripts\fetch_demo_data_windows.bat` without arguments, it
-downloads to the repository-level `data` directory, not `scripts\data`.
+opens an interactive prompt for the data directory, `smpl`/`smplx` mode, and
+whether to force re-download existing files. Press Enter at the data directory
+prompt to use the repository-level `data` directory, not `scripts\data`.
 The window pauses before closing so you can read any download or authentication
 errors. The `.bat` file only changes to the repository root, calls
 `scripts\fetch_demo_data_windows.ps1`, and pauses; the PowerShell script handles
@@ -24,6 +26,12 @@ To save a log file, run it from `cmd.exe`:
 
 ```bat
 scripts\fetch_demo_data_windows.bat D:\camerahmr-data > fetch_demo_data.log 2>&1
+```
+
+To replace previously downloaded files, add `-Force` after the mode:
+
+```bat
+scripts\fetch_demo_data_windows.bat D:\camerahmr-data smpl -Force
 ```
 
 That downloads the SMPL demo files into:
@@ -119,6 +127,12 @@ Run the container:
 
 ```bash
 docker compose run --rm camerahmr
+```
+
+To validate the mounted demo data before running the full demo:
+
+```bash
+docker compose run --rm camerahmr uv run --no-sync python scripts/check_demo_data.py --data-dir data
 ```
 
 The Compose command is equivalent to:

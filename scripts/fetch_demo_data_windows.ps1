@@ -1,6 +1,7 @@
 param(
   [string]$DataDir = "data",
-  [string]$Mode = "smpl"
+  [string]$Mode = "smpl",
+  [switch]$Force
 )
 
 $ErrorActionPreference = "Stop"
@@ -84,7 +85,7 @@ function New-DownloadSpec($Domain, $SFile, $OutFile, [int64]$MinBytes) {
 }
 
 function Invoke-PostDownload($Spec, $Account) {
-  if (Test-FileMinimum $Spec.OutFile $Spec.MinBytes) {
+  if (-not $Force -and (Test-FileMinimum $Spec.OutFile $Spec.MinBytes)) {
     $len = (Get-Item -LiteralPath $Spec.OutFile).Length
     Write-Host ("[skip] {0} ({1:N0} bytes)" -f $Spec.OutFile, $len)
     return
@@ -92,30 +93,76 @@ function Invoke-PostDownload($Spec, $Account) {
 
   if (Test-Path -LiteralPath $Spec.OutFile) {
     $len = (Get-Item -LiteralPath $Spec.OutFile).Length
-    Write-Host ("[replace] {0} is only {1:N0} bytes; downloading again." -f $Spec.OutFile, $len)
+    if ($Force) {
+      Write-Host ("[replace] Force enabled; replacing {0} ({1:N0} bytes)." -f $Spec.OutFile, $len)
+    }
+    else {
+      Write-Host ("[replace] {0} is only {1:N0} bytes; downloading again." -f $Spec.OutFile, $len)
+    }
     Remove-Item -Force -LiteralPath $Spec.OutFile
   }
 
   New-Directory (Split-Path $Spec.OutFile -Parent)
   $url = "https://download.is.tue.mpg.de/download.php?domain=$($Spec.Domain)&sfile=$($Spec.SFile)"
-  Write-Host "[download] $($Spec.SFile)"
-  Write-Host "           -> $($Spec.OutFile)"
-  Invoke-WebRequest `
-    -Uri $url `
-    -Method Post `
-    -Body @{ username = $Account.username; password = $Account.password } `
-    -OutFile $Spec.OutFile `
-    -MaximumRedirection 10 `
-    -UseBasicParsing
-
-  if (-not (Test-Path -LiteralPath $Spec.OutFile)) {
-    throw "Downloaded file does not exist: $($Spec.OutFile)"
+  $partFile = "$($Spec.OutFile).part"
+  if (Test-Path -LiteralPath $partFile) {
+    Remove-Item -Force -LiteralPath $partFile
   }
 
-  $downloadedBytes = (Get-Item -LiteralPath $Spec.OutFile).Length
+  Write-Host "[download] $($Spec.SFile)"
+  Write-Host "           -> $($Spec.OutFile)"
+  try {
+    Invoke-WebRequest `
+      -Uri $url `
+      -Method Post `
+      -Body @{ username = $Account.username; password = $Account.password } `
+      -OutFile $partFile `
+      -MaximumRedirection 10 `
+      -UserAgent "Wget/1.21.4" `
+      -UseBasicParsing
+  }
+  catch {
+    Write-Host "[warn] Invoke-WebRequest failed: $($_.Exception.Message)"
+    Write-Host "[warn] Retrying with curl.exe..."
+    if (Test-Path -LiteralPath $partFile) {
+      Remove-Item -Force -LiteralPath $partFile
+    }
+    Invoke-CurlPostDownload $url $partFile $Account
+  }
+
+  if (-not (Test-Path -LiteralPath $partFile)) {
+    throw "Downloaded temp file does not exist: $partFile"
+  }
+
+  $downloadedBytes = (Get-Item -LiteralPath $partFile).Length
   Write-Host ("[saved] {0:N0} bytes" -f $downloadedBytes)
   if ($downloadedBytes -lt $Spec.MinBytes) {
+    Remove-Item -Force -LiteralPath $partFile
     throw "Downloaded file is smaller than expected minimum $($Spec.MinBytes) bytes. This usually means an authentication, license, or server error page was downloaded instead of the real file: $($Spec.OutFile)"
+  }
+
+  Move-Item -Force -LiteralPath $partFile -Destination $Spec.OutFile
+}
+
+function Invoke-CurlPostDownload($Url, $OutFile, $Account) {
+  $curl = Get-Command curl.exe -ErrorAction SilentlyContinue
+  if (-not $curl) {
+    throw "curl.exe was not found. Invoke-WebRequest failed and curl fallback is unavailable."
+  }
+
+  & $curl.Source `
+    -L `
+    -k `
+    --fail `
+    --retry 3 `
+    --user-agent "Wget/1.21.4" `
+    --output $OutFile `
+    --data-urlencode "username=$($Account.username)" `
+    --data-urlencode "password=$($Account.password)" `
+    $Url
+
+  if ($LASTEXITCODE -ne 0) {
+    throw "curl.exe failed with exit code $LASTEXITCODE for $Url"
   }
 }
 
@@ -172,6 +219,9 @@ function Ensure-SmplxLockedHead {
 Write-Host "[fetch] Downloading CameraHMR demo data"
 Write-Host "[fetch] Data directory: $DataRoot"
 Write-Host "[fetch] Mode: $Mode"
+if ($Force) {
+  Write-Host "[fetch] Force: enabled"
+}
 
 Ensure-CameraHMRSmplDemo
 if ($Mode -eq "smplx") {
