@@ -13,6 +13,7 @@ from core.utils.utils_detectron2 import DefaultPredictor_Lazy
 from core.datasets.dataset import Dataset
 from core.utils.renderer_pyrd import Renderer
 from core.utils import recursive_to
+from core.utils.checkpoint_io import torch_load_trusted, trusted_torch_load
 from core.utils.geometry import batch_rot2aa
 from core.cam_model.fl_net import FLNet
 from core.constants import IMAGE_SIZE, IMAGE_MEAN, IMAGE_STD, NUM_BETAS
@@ -64,7 +65,7 @@ class HumanMeshEstimator:
     def init_cam_model(self):
         from core.constants import CAM_MODEL_CKPT
         model = FLNet()
-        checkpoint = torch.load(CAM_MODEL_CKPT)['state_dict']
+        checkpoint = torch_load_trusted(CAM_MODEL_CKPT, map_location='cpu')['state_dict']
         model.load_state_dict(checkpoint)
         model.eval()
         return model
@@ -79,7 +80,13 @@ class HumanMeshEstimator:
             checkpoint_path = CHECKPOINT_PATH_SMPLX
         else:
             raise ValueError("model_type must be 'smpl' or 'smplx'")
-        model = CameraHMR.load_from_checkpoint(checkpoint_path, strict=False, model_type=self.model_type)
+        with trusted_torch_load():
+            model = CameraHMR.load_from_checkpoint(
+                checkpoint_path,
+                strict=False,
+                model_type=self.model_type,
+                map_location='cpu',
+            )
         model = model.to(self.device)
         model.eval()
         return model

@@ -12,6 +12,7 @@ from core.utils import recursive_to
 from core.datasets.dataset import Dataset
 from core.densekp_trainer import DenseKP
 from core.utils.renderer_pyrd import Renderer
+from core.utils.checkpoint_io import trusted_torch_load
 from core.utils.train_utils import denormalize_images
 from core.constants import DETECTRON_CKPT, DETECTRON_CFG, DENSEKP_CKPT
 from detectron2.config import LazyConfig
@@ -93,7 +94,12 @@ def main():
     args = parser.parse_args()
 
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    model = DenseKP.load_from_checkpoint(args.checkpoint, strict=False).to(device).eval()
+    with trusted_torch_load():
+        model = DenseKP.load_from_checkpoint(
+            args.checkpoint,
+            strict=False,
+            map_location='cpu',
+        ).to(device).eval()
     detector = init_detector(args.detector_threshold)
     os.makedirs(args.out_folder, exist_ok=True)
 

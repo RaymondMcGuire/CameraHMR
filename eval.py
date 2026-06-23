@@ -21,6 +21,7 @@ from yacs.config import CfgNode
 from core.configs import dataset_config
 from core.datasets import DataModule
 from core.cam_model.fl_net import FLNet
+from core.utils.checkpoint_io import torch_load_trusted, trusted_torch_load
 
 from core.utils.pylogger import get_pylogger
 import signal
@@ -51,10 +52,15 @@ def eval(cfg: DictConfig) -> Tuple[dict, dict]:
         raise ValueError(f"Unknown model type: {cfg.MODEL.TYPE}")
         
 
-    model = CameraHMR.load_from_checkpoint(checkpoint_path, strict=False)
+    with trusted_torch_load():
+        model = CameraHMR.load_from_checkpoint(
+            checkpoint_path,
+            strict=False,
+            map_location='cpu',
+        )
     
     from core.constants import CAM_MODEL_CKPT
-    cam_model_checkpoint = torch.load(CAM_MODEL_CKPT)['state_dict']
+    cam_model_checkpoint = torch_load_trusted(CAM_MODEL_CKPT, map_location='cpu')['state_dict']
     model.cam_model.load_state_dict(cam_model_checkpoint)
 
     trainer = pl.Trainer()
