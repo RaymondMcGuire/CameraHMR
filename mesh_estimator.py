@@ -183,9 +183,9 @@ class HumanMeshEstimator:
             pred_vertices_array = (output_vertices + output_cam_trans.unsqueeze(1)).detach().cpu().numpy()
             renderer = Renderer(focal_length=focal_length[0], img_w=img_w, img_h=img_h, faces=self.body_model.faces, same_mesh_color=True)
             front_view = renderer.render_front_view(pred_vertices_array, bg_img_rgb=img_cv2.copy())
-            final_img = front_view
+            final_img = np.clip(front_view, 0, 255).astype(np.uint8)
             # Write overlay
-            cv2.imwrite(overlay_fname, final_img)
+            cv2.imwrite(overlay_fname, cv2.cvtColor(final_img, cv2.COLOR_RGB2BGR))
             renderer.delete()
 
 

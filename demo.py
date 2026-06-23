@@ -1,4 +1,12 @@
 import argparse
+import warnings
+
+warnings.filterwarnings(
+    "ignore",
+    message=r"torch\.meshgrid: in an upcoming release",
+    category=UserWarning,
+)
+
 from mesh_estimator import HumanMeshEstimator
 
 
