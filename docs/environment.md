@@ -3,8 +3,7 @@
 This repository now uses `pyproject.toml` as the primary environment definition.
 The Docker/Compose path defaults to Python 3.10, PyTorch 2.7.1, torchvision
 0.22.1, torchaudio 2.7.1, and CUDA 12.8 so RTX 50-series GPUs can run the
-demo. The original release stack, PyTorch 2.0.0 with CUDA 11.8, is still
-available as the `cu118` extra for older GPUs.
+demo.
 
 ## Local uv setup
 
@@ -13,8 +12,6 @@ Install the CUDA 12.8 demo environment used by the Docker image:
 ```bash
 uv sync --extra cu128 --extra demo
 ```
-
-For the original CUDA 11.8 stack, use `uv sync --extra cu118 --extra demo`.
 
 The image demos use Detectron2 for person detection. Install it after `uv sync`
 so the source build sees the PyTorch version in the project environment:

@@ -34,8 +34,7 @@
 The project is now described by `pyproject.toml` and can be recreated with
 [uv](https://docs.astral.sh/uv/). The Docker/Compose environment defaults to
 Python 3.10, PyTorch 2.7.1, torchvision 0.22.1, torchaudio 2.7.1, and CUDA
-12.8 so RTX 50-series GPUs can run the demo. The original CUDA 11.8 research
-stack is still available as the `cu118` extra for older GPUs.
+12.8 so RTX 50-series GPUs can run the demo.
 
 ```
 uv sync --extra cu128 --extra demo
@@ -60,8 +59,7 @@ docker compose build
 
 See [docs/environment.md](docs/environment.md) for CPU setup, data mounts, and
 container run examples. Windows + WSL users can follow
-[docs/windows-wsl-docker.md](docs/windows-wsl-docker.md). `requirements.txt` is
-kept as a legacy reference, but uv is the preferred path.
+[docs/windows-wsl-docker.md](docs/windows-wsl-docker.md).
 
 ## 🎬 **Demo**
 

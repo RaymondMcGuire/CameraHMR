@@ -33,11 +33,6 @@ cpu = [
   "torchaudio==2.0.1",
   "torchvision==0.15.1",
 ]
-cu118 = [
-  "torch==2.0.0",
-  "torchaudio==2.0.1",
-  "torchvision==0.15.1",
-]
 cu128 = [
   "torch==2.7.1",
   "torchaudio==2.7.1",
@@ -70,7 +65,6 @@ package = false
 conflicts = [
   [
     { extra = "cpu" },
-    { extra = "cu118" },
     { extra = "cu128" },
   ],
 ]
@@ -81,28 +75,20 @@ chumpy = ["pip"]
 [tool.uv.sources]
 torch = [
   { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu118", extra = "cu118" },
   { index = "pytorch-cu128", extra = "cu128" },
 ]
 torchvision = [
   { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu118", extra = "cu118" },
   { index = "pytorch-cu128", extra = "cu128" },
 ]
 torchaudio = [
   { index = "pytorch-cpu", extra = "cpu" },
-  { index = "pytorch-cu118", extra = "cu118" },
   { index = "pytorch-cu128", extra = "cu128" },
 ]
 
 [[tool.uv.index]]
 name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
-explicit = true
-
-[[tool.uv.index]]
-name = "pytorch-cu118"
-url = "https://download.pytorch.org/whl/cu118"
 explicit = true
 
 [[tool.uv.index]]
